@@ -1,17 +1,17 @@
 {% extends "encyclopedia/layout.html" %}
-{% load static %}
-
 
 {% block title %}
-    New Entry
+    Create
 {% endblock %}
 
 {% block body %}
-    <h1>Create New Page</h1>
-    <hr>
-
-    <form>
-      <input class="title" type="text" name="q" placeholder="Title" autocomplete="off" id="title"><br>
-      <input class="title" type="text" name="q" placeholder="Body" autocomplete="off" id="body">
+    <form method="post" action="{% url 'new' %}" autocomplete="off">
+        {% csrf_token %}
+        <h1>Create new page:</h1>
+        <hr>
+        <h6 style="font-size: 24px;">Title: {{post.title}}</h6>
+            {{post.textarea}}
+        <br>
+        <input class="btn btn-outline-dark" type="submit" value="Save"/>
     </form>
 {% endblock %}

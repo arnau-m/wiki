@@ -9,6 +9,10 @@ from . import util
 class SearchEntry(forms.Form):
     search = forms.CharField()
 
+class NewEntry(forms.Form):
+    title = forms.CharField()
+    textarea = forms.CharField(widget=forms.Textarea(), label='')
+
 def index(request):
     entries = util.list_entries()
     searched = []
@@ -33,9 +37,24 @@ def index(request):
         })
 
 def new(request):
-    return render(request, "encyclopedia/new.html",{
-        "form":SearchEntry()
-    })
+    form = NewEntry(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        title = form.cleaned_data["title"]
+        textarea = form.cleaned_data["textarea"]
+        entries = util.list_entries()
+        if title in entries:
+            return render(request, "encyclopedia/404.html", {"msg": "This entry is already in use.", "form": SearchEntry()})
+        else:
+            util.save_entry(title, textarea)
+            entry = markdowner.convert(util.get_entry(title))
+            return render(request, "encyclopedia/wiki.html", {
+                "entry": entry, "title":title, "form": SearchEntry()
+            })
+    else:
+        return render(request, "encyclopedia/new.html", {
+            "form": SearchEntry(), "post": NewEntry()
+        })
+
 
 def random(request):
     return render(request, "encyclopedia/random.html", {
