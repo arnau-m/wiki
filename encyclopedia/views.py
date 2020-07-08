@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from markdown2 import Markdown
+markdowner = Markdown()
+
 from . import util
 
 
@@ -8,6 +10,10 @@ def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
+
+
+
+
 def new(request):
     return render(request, "encyclopedia/new.html",{
 
