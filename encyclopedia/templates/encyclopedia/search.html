@@ -7,9 +7,16 @@
 {% block body %}
 <h2 class="display-4">Found pages:</h2>
 <hr>
+<<<<<<< HEAD
     {% for item in searched %}
         <li><a href=/wiki/{{item}}>{{ item }}</a></li>
         {% empty %}
             <h2>404   Try to writte the entry again</h2>
+=======
+    {% for entry in searched %}
+        <li><a href=/wiki/{{entry}}>{{ entry }}</a></li>
+        {% empty %}
+            <h3>No item</h3>
+>>>>>>> search
     {% endfor %}
 {% endblock %}
