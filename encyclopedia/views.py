@@ -1,3 +1,5 @@
+import random
+from random import choice
 from django.shortcuts import render
 from django import forms
 from django.http import HttpResponse
@@ -12,6 +14,10 @@ class SearchEntry(forms.Form):
 class NewEntry(forms.Form):
     title = forms.CharField()
     textarea = forms.CharField(widget=forms.Textarea(), label='')
+
+class EditEntry(forms.Form):
+    textarea = forms.CharField(widget=forms.Textarea(), label='')
+
 
 def index(request):
     entries = util.list_entries()
@@ -57,8 +63,11 @@ def new(request):
 
 
 def random(request):
-    return render(request, "encyclopedia/random.html", {
-        "form":SearchEntry()
+    entries = choice(util.list_entries())
+    entry = util.get_entry(entries)
+    return render(request, "encyclopedia/wiki.html", {
+        "form":SearchEntry(),
+        "entry": Markdown().convert(entry)
     })
 
 def wiki(request, title):
@@ -70,7 +79,19 @@ def wiki(request, title):
            "form":SearchEntry()
         })
     else:
-        return render(request, "encyclopedia/404.html", {
+        return render(request, "encyclopedia/404.html",{
             "msg": msg,
             "form":SearchEntry()
         })
+
+def edit(request, title):
+    if request.method == 'GET':
+        page = util.get_entry(title)
+        return render(request, "encyclopedia/edit.html", {"form": SearchEntry(), "edit":EditEntry(initial={'textarea': page}), 'title':title})
+    else:
+        form = EditEntry(request.POST)
+        if form.is_valid():
+            textarea = form.cleaned_data["textarea"]
+            util.save_entry(title,textarea)
+            entry = markdowner.convert(util.get_entry(title))
+            return render(request, "encyclopedia/wiki.html", {"form": SearchEntry(), "entry": entry, "title": title})
